@@ -27,7 +27,11 @@ test('user can create a new todo item', async ({ page }) => {
     hasText: TEST_TODO_TITLE,
   });
   const count = await todoItems.count();
-  expect(count).toBe(1);
+  expect(todoItems).toHaveCount(1);
+  // count()+toBe fallaba porque contaba una sola vez, antes de que el item apareciera.
+  // todoItems no es un valor fijo es la intruccion de busqueda, y toHaveCount(1) verifica que 
+  // haya exactamente un elemento que coincida con la busqueda
+  // y reintenta hasta que haya un elemento que coincida con la busqueda
 });
 
 test('created todo appears with uncompleted state', async ({ page }) => {
@@ -41,6 +45,7 @@ test('created todo appears with uncompleted state', async ({ page }) => {
   await page.waitForURL('/todos');
 
   // Create a todo with the same hardcoded title
+  
   await page.locator('[data-testid="todo-input"]').fill(TEST_TODO_TITLE);
   await page.locator('[data-testid="add-todo-button"]').click();
 
