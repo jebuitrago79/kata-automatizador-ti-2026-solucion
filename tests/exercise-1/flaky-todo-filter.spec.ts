@@ -34,27 +34,26 @@ test.describe('Todo filtering', () => {
   });
 
   test('filter shows only completed todos', async ({ page }) => {
-    // Click on "Completed" filter using implementation-specific selectors
-    await page.locator(
-      'div.filter-section > div:nth-child(1) > button:nth-child(3)'
-    ).click();
 
-    // Verify all visible todos have completed styling
-    const todoItems = page.locator(
-      'ul.MuiList-root > li.MuiListItem-root'
-    );
+  await page.getByTestId('filter-completed').click();
+  // Selector semántico por data-testid en vez de ul.MuiList-root > li.MuiListItem-root,
+  // acoplado a las clases internas de MUI.
+  
 
-    const count = await todoItems.count();
-    expect(count).toBeGreaterThan(0);
+  const todoItems = page.getByTestId('todo-item');
+  await expect(todoItems.first()).toBeVisible();
+  // asegura que la lista cargó
 
-    for (let i = 0; i < count; i++) {
-      const item = todoItems.nth(i);
-      // Check for the strikethrough class that MUI applies
-      const textDecoration = await item.locator('span.MuiTypography-root').evaluate(
-        (el) => getComputedStyle(el).textDecoration
-      );
-      expect(textDecoration).toContain('line-through');
-    }
+  const count = await todoItems.count();
+  expect(count).toBeGreaterThan(0);
+
+
+  // FIX: se verifica el estado real (checkbox marcado) en vez de leer el CSS de tachado
+  for (let i = 0; i < count; i++) {
+    const checkbox = todoItems.nth(i).locator('input[type="checkbox"]');
+    await expect(checkbox).toBeChecked();
+  }
+
   });
 
   test('filter "All" shows all todos', async ({ page }) => {
