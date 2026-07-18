@@ -35,6 +35,10 @@ test('user can create a new todo item', async ({ page }) => {
 });
 
 test('created todo appears with uncompleted state', async ({ page }) => {
+  const uniqueTitle = `Comprar leche ${Date.now()}`;
+  //Se corrige el test ya que utiliza el mismo titulo TEST_TODO_TITLE esto generaba dependencia entre tests,
+  //si fallaba el test anterior, este test fallaba porque no encontraba el todo creado, 
+  // por eso se genera un titulo unico para cada test
   await page.goto('/login');
   await page.locator('#email').fill('user@test.com');
   await page.locator('#password').fill('Test1234!');
@@ -45,13 +49,13 @@ test('created todo appears with uncompleted state', async ({ page }) => {
   await page.waitForURL('/todos');
 
   // Create a todo with the same hardcoded title
-  
-  await page.locator('[data-testid="todo-input"]').fill(TEST_TODO_TITLE);
+  await page.locator('[data-testid="todo-input"]').fill(uniqueTitle);
+  //dejamos de apuntar TEST_TODO_TITLE y apuntamos a uniqueTitle para que cada test tenga su propio titulo unico
   await page.locator('[data-testid="add-todo-button"]').click();
 
   // Find the todo and check its checkbox is unchecked
   const todoCheckbox = page.locator('[data-testid="todo-item"]', {
-    hasText: TEST_TODO_TITLE,
+    hasText: uniqueTitle,
   }).locator('input[type="checkbox"]');
 
   await expect(todoCheckbox.first()).not.toBeChecked();
