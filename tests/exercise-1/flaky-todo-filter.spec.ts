@@ -15,14 +15,17 @@ test.describe('Todo filtering', () => {
 
   test('filter shows only active todos', async ({ page }) => {
     // Click on the "Active" filter button using CSS selectors
-    const filterBar = page.locator('div.MuiButtonGroup-root');
-    const activeButton = filterBar.locator('button.MuiButton-root:nth-child(2)');
-    await activeButton.click();
+
+    await page.getByTestId('filter-active').click();
+    // los tests usaban selectores CSS acoplados a la implementación
+    // cambie por el selector getByTestId que
+    // identifican los elementos el id de testing que se le asigna a cada elemento de la aplicacion.
+
 
     // Verify all visible todos are unchecked
-    const checkboxes = page.locator(
-      'div.todo-list-container > div.MuiList-root > div.MuiListItem-root input[type="checkbox"]'
-    );
+    const checkboxes = page.getByTestId('todo-item').locator('input[type="checkbox"]');
+    // getByTestId('todo-item') en vez de la cadena div.MuiList-root > div.MuiListItem-root:
+
 
     const count = await checkboxes.count();
     for (let i = 0; i < count; i++) {
