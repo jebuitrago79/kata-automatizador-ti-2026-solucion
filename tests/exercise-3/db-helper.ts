@@ -26,8 +26,13 @@ export interface TodoRecord {
  * Must use parameterized queries to prevent SQL injection.
  */
 export async function findTodoByTitle(title: string): Promise<TodoRecord | null> {
-  // Your implementation here
-  throw new Error('Not implemented');
+  // $1 es un parámetro: pg lo sustituye de forma segura, evitando inyección SQL.
+  const result: QueryResult<TodoRecord> = await pool.query(
+    'SELECT * FROM todos WHERE title = $1',
+    [title]
+  );
+  // Devuelve la primera fila si existe, o null si no hay resultados.
+  return result.rows[0] ?? null;
 }
 
 /**
@@ -35,18 +40,25 @@ export async function findTodoByTitle(title: string): Promise<TodoRecord | null>
  * Returns the completed status for a given todo ID.
  */
 export async function isTodoCompleted(todoId: number): Promise<boolean> {
-  // Your implementation here
-  throw new Error('Not implemented');
+  const result: QueryResult<{ completed: boolean }> = await pool.query(
+    'SELECT completed FROM todos WHERE id = $1',
+    [todoId]
+  );
+  // Si no existe la tarea, devuelve false; si existe, su estado completed.
+  return result.rows[0]?.completed ?? false;
 }
-
 /**
  * TODO: Implement an idempotent cleanup function.
  * Should delete only todos created during tests (identified by a prefix or pattern).
  * Must not throw if the records don't exist.
  */
 export async function cleanupTestTodos(titlePrefix: string): Promise<void> {
-  // Your implementation here
-  throw new Error('Not implemented');
+  // LIKE con $1 || '%' borra los títulos que empiezan con el prefijo.
+  // DELETE no falla si no encuentra filas, por eso es naturalmente idempotente.
+  await pool.query(
+    "DELETE FROM todos WHERE title LIKE $1 || '%'",
+    [titlePrefix]
+  );
 }
 
 /**
