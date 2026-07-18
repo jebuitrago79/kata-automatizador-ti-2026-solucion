@@ -58,12 +58,15 @@ test.describe('Todo filtering', () => {
 
   test('filter "All" shows all todos', async ({ page }) => {
     // Click "All" filter
-    await page.locator(
-      '.filter-buttons > .MuiButtonGroup-grouped:first-child'
-    ).click();
+    await page.getByTestId('filter-all').click();
+    // Selector semántico por data-testid en vez de ul.MuiList-root > li.MuiListItem-root,
 
     // Count total todos visible
-    const allTodos = page.locator('div.MuiList-root > div.MuiListItem-root');
+    const allTodos = page.getByTestId('todo-item');
+    // Selector semántico por data-testid.
+
+    await expect(allTodos.first()).toBeVisible(); 
+    // espera a que la lista cargue antes de contar
     const count = await allTodos.count();
     expect(count).toBeGreaterThan(0);
   });
