@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { LoginPage } from './pages/login.page';
 import { TodoListPage } from './pages/todo-list.page';
+import { TodoBuilder } from './builders/todo.builder'; 
 
 // Antes de cada test: login y navegación a la lista de tareas.
 // Así cada test empieza ya autenticado y en /todos, sin repetir esos pasos.
@@ -58,4 +59,11 @@ test('filtrar por completadas muestra solo las completadas', async ({ page }) =>
   await todoPage.completeTodo(titulo);
   await todoPage.filterBy('completed');
   await expect(todoPage.getTodo(titulo)).toHaveCount(1);
+});
+
+test('crear tarea con builder', async ({ page }) => {
+  const todoPage = new TodoListPage(page);
+  const todo = new TodoBuilder().withTitle('Crear').build();
+  await todoPage.createTodo(todo.title);
+  await expect(todoPage.getTodo(todo.title)).toHaveCount(1);
 });
