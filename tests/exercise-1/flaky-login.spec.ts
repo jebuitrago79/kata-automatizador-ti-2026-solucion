@@ -32,5 +32,6 @@ test('user sees error with invalid credentials', async ({ page }) => {
   // Verify error is shown
   const errorAlert = page.locator('[data-testid="login-error"]');
   await expect(errorAlert).toBeVisible();
-  await expect(errorAlert).toContainText('credenciales');
+  //EL texto que buscaba la alerta no era el correcto, por eso se cambio a 'Credenciales inválidas' que es el texto que se muestra en la alerta.
+  await expect(errorAlert).toContainText('Credenciales inválidas');
 });
