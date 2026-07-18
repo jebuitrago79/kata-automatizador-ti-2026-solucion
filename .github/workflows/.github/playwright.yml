@@ -1,0 +1,58 @@
+name: Playwright Tests
+
+# Ejecuta el workflow en cada push y pull request a master.
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Descarga el código del repositorio.
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      # 2. Levanta la app y la base de datos con Docker Compose.
+      - name: Levantar app y base de datos
+        run: docker compose up -d
+
+      # 3. Instala Node.js 20.
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # 4. Instala las dependencias del proyecto.
+      - name: Instalar dependencias
+        run: npm ci
+
+      # 5. Instala los navegadores de Playwright con sus dependencias del sistema.
+      - name: Instalar navegadores de Playwright
+        run: npx playwright install --with-deps
+
+      # 6. Espera a que la app responda antes de correr los tests.
+      - name: Esperar a que la app esté lista
+        run: npx wait-on http://localhost:3000/login --timeout 60000
+
+      # 7. Ejecuta los tests. Las variables de entorno de la DB se pasan aquí.
+      - name: Ejecutar tests de Playwright
+        run: npx playwright test
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: tododb
+          DB_USER: testuser
+          DB_PASSWORD: testpass
+
+      # 8. Publica el reporte HTML como artefacto (siempre, pasen o fallen los tests).
+      - name: Publicar reporte HTML
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
