@@ -12,7 +12,9 @@ test('user can login with valid credentials', async ({ page }) => {
   await page.locator('button[type="submit"]').click();
 
   // Verify redirect to dashboard
-  expect(page.url()).toContain('/dashboard');
+  await expect(page).toHaveURL('/dashboard');
+  //Fallaba por que se leia la URL sin esperar a que se redirigiera, por eso se agrego la espera de URL
+  //Se cambia el assertion por toHaveURL que reintenta hasta que la URL sea la esperada.
 
   // Verify welcome message is displayed
   const welcomeMessage = page.locator('[data-testid="welcome-message"]');
