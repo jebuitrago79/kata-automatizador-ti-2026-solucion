@@ -26,8 +26,7 @@ test('user can create a new todo item', async ({ page }) => {
   const todoItems = page.locator('[data-testid="todo-item"]', {
     hasText: TEST_TODO_TITLE,
   });
-  const count = await todoItems.count();
-  expect(todoItems).toHaveCount(1);
+  await expect(todoItems).toHaveCount(1);
   // count()+toBe fallaba porque contaba una sola vez, antes de que el item apareciera.
   // todoItems no es un valor fijo es la intruccion de busqueda, y toHaveCount(1) verifica que 
   // haya exactamente un elemento que coincida con la busqueda
